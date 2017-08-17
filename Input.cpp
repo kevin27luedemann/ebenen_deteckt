@@ -7,6 +7,10 @@
 
 
 #include "Input.h"
+#ifndef F_CPU
+#define F_CPU 8000000
+#endif
+#include <util/delay.h>
 
 // default constructor
 Input::Input(uint8_t Portpraefix, uint8_t Pinnumber, uint8_t pullup)
@@ -75,19 +79,22 @@ uint8_t Input::ison(){
 		case 'B':
 			if (!(PINB&(1<<Pin)))
 			{
-				returnparam = 1;
+                _delay_ms(1);
+                if (!(PINB&(1<<Pin))){returnparam = 1;}
 			}
 			break;
 		case 'C':
 			if (!(PINC&(1<<Pin)))
 			{
-				returnparam = 1;
+                _delay_ms(1);
+                if (!(PINC&(1<<Pin))){returnparam = 1;}
 			}
 			break;
 		case 'D':
 			if (!(PIND&(1<<Pin)))
 			{
-				returnparam = 1;
+                _delay_ms(1);
+                if (!(PIND&(1<<Pin))){returnparam = 1;}
 			}
 			break;
 	}

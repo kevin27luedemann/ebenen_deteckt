@@ -1,12 +1,12 @@
 TARGET=main
-MCU=atmega328p
+MCU=atmega8
 SOURCES=$(TARGET).cpp Input.cpp Output.cpp
 #SOURCES=$(shell find . -type f -name '*.cpp')
 
 PROGRAMMER=stk500
 #auskommentieren für automatische Wahl
-PORT=-P/dev/ttyUSB0
-BAUD=-B11600
+PORT=/dev/ttyUSB0
+BAUD=11600
 
 #Ab hier nichts verändern
 OBJECTS=$(SOURCES:.cpp=.o)
@@ -36,13 +36,14 @@ size:
 	avr-size --mcu=$(MCU) -C $(TARGET).elf
 
 program: $(TARGET).hex
-	avrdude -p$(MCU) $(PORT) $(BAUD) -c$(PROGRAMMER) -Uflash:w:$(TARGET).hex:a
+	#avrdude -p$(MCU) -P$(PORT) -B$(BAUD) -c$(PROGRAMMER) -Uflash:w:$(TARGET).hex:a
+	~/bin/bootloader -d $(PORT) -v -p $(TARGET).hex
 
 readee:
-	avrdude -p$(MCU) $(PORT) $(BAUD) -c$(PROGRAMMER) -Ueeprom:r:$(TARGET).eep:i
+	avrdude -p$(MCU) -P$(PORT) -B$(BAUD) -c$(PROGRAMMER) -Ueeprom:r:$(TARGET).eep:i
 
 readfl:
-	avrdude -p$(MCU) $(PORT) $(BAUD) -c$(PROGRAMMER) -Uflash:r:$(TARGET).fla:i
+	avrdude -p$(MCU) -P$(PORT) -B$(BAUD) -c$(PROGRAMMER) -Uflash:r:$(TARGET).fla:i
 
 clean_tmp:
 	rm -rf *.o

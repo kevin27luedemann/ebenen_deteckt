@@ -10,21 +10,20 @@
 Input taster('D',3,true);
 Output LED('C',0);
 
-ISR(USART_RX_vect){
-    uint8_t temp = UDR0;
+ISR(USART_RXC_vect){
+    uint8_t temp = UDR;
     if(temp=='d'){
-        UDR0 = taster.ison()+'0';
+        UDR = taster.ison()+'0';
         LED.on();
     }
-    _delay_ms(50);
 }
 
 int main(){
 
-	UBRR0H = 0;
-	UBRR0L = 51;							//9600 Baud
-	UCSR0C = (1<<UCSZ00) | (1<<UCSZ01);	// 8Bit Frame
-	UCSR0B = (1<<RXCIE0) | (1<<RXEN0) | (1<<TXEN0);
+	UBRRH = 0;
+	UBRRL = 51;							//9600 Baud
+	UCSRC = (1<<URSEL) | (1<<UCSZ0) | (1<<UCSZ1);	// 8Bit Frame
+	UCSRB = (1<<RXCIE) | (1<<RXEN) | (1<<TXEN);
     sei();
 
     while(true){
@@ -34,7 +33,7 @@ int main(){
         else{
             LED.off();
         }
-        _delay_ms(50);
+        _delay_ms(1);
     }
     return 0;
 }
