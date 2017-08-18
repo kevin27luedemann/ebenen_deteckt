@@ -1,7 +1,7 @@
 TARGET=main
 MCU=atmega8
-SOURCES=$(TARGET).cpp Input.cpp Output.cpp l74hc595b.cpp
-#SOURCES=$(shell find . -type f -name '*.cpp')
+#SOURCES=$(TARGET).cpp l74hc595b.cpp Input.cpp seven_seg.cpp Ou
+SOURCES=$(shell find . -type f -name '*.cpp')
 
 PROGRAMMER=stk500
 #auskommentieren für automatische Wahl
