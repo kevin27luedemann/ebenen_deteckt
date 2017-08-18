@@ -8,12 +8,21 @@
 #include <util/delay.h>
 
 Input taster('D',3,true);
+Input deadend_up('D',2,true);
+Input deadend_do('D',4,true);
 Output LED('C',0);
+
+void send_UART(char data){
+    while(!(UCSRA&(1<<UDRE)));
+    UDR = data;
+}
 
 ISR(USART_RXC_vect){
     uint8_t temp = UDR;
     if(temp=='d'){
-        UDR = taster.ison()+'0';
+        send_UART(taster.ison()+'0');
+        send_UART(deadend_up.ison()+'0');
+        send_UART(deadend_do.ison()+'0');
         LED.on();
     }
 }
@@ -28,6 +37,12 @@ int main(){
 
     while(true){
         if(taster.ison()){
+            LED.on();
+        }
+        else if(deadend_up.ison()){
+            LED.on();
+        }
+        else if(deadend_do.ison()){
             LED.on();
         }
         else{
