@@ -43,9 +43,8 @@ uint8_t Input::pressed(){
     if (!(*PIN&(1<<pin_num)))
     {
         is_down = 1;
-        //_delay_ms(30);
     }
-    if ((*PIN&(1<<pin_num)) && is_down==1){returnparam = 1; is_down = 0;}
+    else if ((*PIN&(1<<pin_num)) && is_down==1){returnparam = 1; is_down = 0;}
 	return returnparam;
 }
 

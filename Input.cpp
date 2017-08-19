@@ -13,91 +13,38 @@
 #include <util/delay.h>
 
 // default constructor
-Input::Input(uint8_t Portpraefix, uint8_t Pinnumber, uint8_t pullup)
+Input::Input(volatile uint8_t *IDDR, volatile uint8_t *IPORT, volatile uint8_t *IPIN, uint8_t PIN_NUMMER, uint8_t pullup)
 {
-	Pin=Pinnumber;
-	Port=Portpraefix;
-	switch (Portpraefix)
-	{
-        /*
-		case 'A':
-			DDRA &= ~(1<<Pin);
-            if(pullup){PORTA |= (1<<Pin);}
-			break;*/
-		case 'B':
-			DDRB &= ~(1<<Pin);
-            if(pullup){PORTB |= (1<<Pin);}
-			break;
-		case 'C':
-			DDRC &= ~(1<<Pin);
-            if(pullup){PORTC |= (1<<Pin);}
-			break;
-		case 'D':
-			DDRD &= ~(1<<Pin);
-            if(pullup){PORTD |= (1<<Pin);}
-			break;
-		default:
-			break;
-	}
+    DDR     = IDDR;
+    PORT    = IPORT;
+    PIN     = IPIN;
+    pin_num = PIN_NUMMER;
+    if(pullup){*PORT |= (1<<pin_num);}
+    is_down = 0;
 } //Input
 
 // default destructor
 Input::~Input()
 {
-	switch (Port)
-	{
-        /*
-		case 'A':
-            PORTA &= ~(1<<Pin);
-			break;*/
-		case 'B':
-            PORTB &= ~(1<<Pin);
-			break;
-		case 'C':
-            PORTC &= ~(1<<Pin);
-			break;
-		case 'D':
-            PORTD &= ~(1<<Pin);
-			break;
-		default:
-			break;
-	}
+    *PORT &= ~(1<<pin_num);
 } //~Input
-
 
 uint8_t Input::ison(){
 	uint8_t returnparam=0;
-	switch (Port)
-	{
-        /*
-		case 'A':
-			if (!(PINA&(1<<Pin)))
-			{
-				returnparam = 1;
-			}
-			break;*/
-		case 'B':
-			if (!(PINB&(1<<Pin)))
-			{
-                _delay_ms(1);
-                if (!(PINB&(1<<Pin))){returnparam = 1;}
-			}
-			break;
-		case 'C':
-			if (!(PINC&(1<<Pin)))
-			{
-                _delay_ms(1);
-                if (!(PINC&(1<<Pin))){returnparam = 1;}
-			}
-			break;
-		case 'D':
-			if (!(PIND&(1<<Pin)))
-			{
-                _delay_ms(1);
-                if (!(PIND&(1<<Pin))){returnparam = 1;}
-			}
-			break;
-	}
+    if (!(*PIN&(1<<pin_num)))
+    {
+        returnparam = 1;
+    }
+	return returnparam;
+}
+
+uint8_t Input::pressed(){
+	uint8_t returnparam=0;
+    if (!(*PIN&(1<<pin_num)))
+    {
+        is_down = 1;
+    }
+    else if ((*PIN&(1<<pin_num)) && is_down==1){returnparam = 1; is_down = 0;}
 	return returnparam;
 }
 

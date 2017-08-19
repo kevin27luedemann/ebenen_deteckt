@@ -18,18 +18,22 @@ class Input
 public:
 protected:
 private:
-	uint8_t Port;
-	uint8_t Pin;
+	volatile uint8_t *PORT;
+	volatile uint8_t *DDR;
+	volatile uint8_t *PIN;
+	uint8_t pin_num;
 
 //functions
 public:
-	Input(uint8_t Portadresse, uint8_t Pinnumber, uint8_t pullup);
+	Input(volatile uint8_t *IDDR, volatile uint8_t *IPORT, volatile uint8_t *IPIN, uint8_t PIN_NUMMER, uint8_t pullup);
 	~Input();
 	uint8_t ison();
+	uint8_t pressed();
 protected:
 private:
 	Input( const Input &c );
 	Input& operator=( const Input &c );
+	uint8_t is_down;
 
 }; //Input
 
