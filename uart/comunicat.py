@@ -7,16 +7,19 @@ import sys
 
 def main():
     ser = se.Serial('/dev/ttyUSB0', 9600)
-    ind = 0;
+    last = ""
     while True:
-        now = dt.datetime.now().strftime("%H%M1AA%S1")
-        for n in now[ind:5+ind]:
-            ser.write(n)
-        ti.sleep(0.5)
-        ser.write('d')
-        sys.stdout.write("\r{}, {}, {}".format(now,ind,ser.read()))
-        sys.stdout.flush()
-        ind = (ind+5)%10
+        #now = dt.datetime.now().strftime("%H%M1AA%S1")
+        now = dt.datetime.now().strftime("%H%M1")
+        if now != last:
+            for n in now:
+                ser.write(n)
+            last = now
+        else:
+            ti.sleep(1)
+            ser.write('d')
+            sys.stdout.write("\r{}, {}".format(now,ser.read()))
+            sys.stdout.flush()
         #print now, ser.read()
 
 if __name__ == "__main__":

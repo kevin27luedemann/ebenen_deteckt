@@ -70,16 +70,16 @@ void seven_seg::deactivate_tran(uint8_t pos){*PORT |= (1<<(PIN_ST+pos));}
 void seven_seg::next_segement(){
     uint8_t byte;
     deactivate_tran(now_segment);
+    shifti->setregalloff();
+    shifti->shiftout();
     now_segment++;
     if(now_segment>=num_digits){now_segment=0;}
-    activate_tran(now_segment);
-    shifti->setregalloff();
     if(digits[now_segment]<0 || digits[now_segment]>9){byte=0;}
     else{byte = segment_code[digits[now_segment]];}
-    //byte = segment_code[digits[now_segment]];
     if(now_segment==dot_pos){byte|=segment_code[10];}
     shifti->setchipbyte(0,byte);
     shifti->shiftout();
+    activate_tran(now_segment);
 }
 void seven_seg::on(){ison = true;}
 void seven_seg::off(){ison = false;}
