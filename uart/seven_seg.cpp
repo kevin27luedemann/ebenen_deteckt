@@ -71,7 +71,6 @@ void seven_seg::next_segement(){
     uint8_t byte;
     deactivate_tran(now_segment);
     shifti->setregalloff();
-    shifti->shiftout();
     now_segment++;
     if(now_segment>=num_digits){now_segment=0;}
     if(digits[now_segment]<0 || digits[now_segment]>9){byte=0;}
