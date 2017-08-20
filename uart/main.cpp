@@ -13,7 +13,7 @@
 
 l74hc595b shift_reg(&DDRB,&PORTB,1,2,3,1);
 seven_seg seg(4,&DDRC,&PORTC,0,&shift_reg);
-Input taster(&DDRD,&PORTD,&PIND,4,true);
+Input taster(&DDRD,&PORTD,&PIND,6,true);
 Output LED(&DDRB,&PORTB,0);
 
 void send_UART(char data){
