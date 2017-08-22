@@ -1,6 +1,7 @@
 //this example runs with 2 shift registers
 
 #define F_CPU 8000000
+#define BAUD 9600
 
 #include <stdio.h>
 #include <avr/io.h>
@@ -10,16 +11,12 @@
 #include "Input.h"
 #include "Output.h"
 #include "l74hc595b.h"
+#include "com.h"
 
 l74hc595b shift_reg(&DDRB,&PORTB,1,2,3,1);
 seven_seg seg(4,&DDRC,&PORTC,0,&shift_reg);
 Input taster(&DDRD,&PORTD,&PIND,6,true);
 Output LED(&DDRB,&PORTB,0);
-
-void send_UART(char data){
-    while(!(UCSRA&(1<<UDRE)));
-    UDR = data;
-}
 
 ISR(TIMER0_OVF_vect){
     if(seg.ison){
@@ -29,10 +26,10 @@ ISR(TIMER0_OVF_vect){
 }
 
 ISR(USART_RXC_vect){
-    uint8_t temp = UDR;
+    uint8_t temp = uart_getc();
     static uint8_t count = 0;
     if(temp=='d'){
-        send_UART(taster.ison()+'0');
+        uart_putc(taster.ison()+'0');
     }
     else{
         if(count==4){
@@ -60,10 +57,11 @@ ISR(USART_RXC_vect){
 int main(void) {
 
     //USART setting
-	UBRRH = 0;
-	UBRRL = 51;							//9600 Baud
-	UCSRC = (1<<URSEL) | (1<<UCSZ0) | (1<<UCSZ1);	// 8Bit Frame
-	UCSRB = (1<<RXCIE) | (1<<RXEN) | (1<<TXEN);
+	//UBRRH = 0;
+	//UBRRL = 51;							//9600 Baud
+	//UCSRC = (1<<URSEL) | (1<<UCSZ0) | (1<<UCSZ1);	// 8Bit Frame
+	//UCSRB = (1<<RXCIE) | (1<<RXEN) | (1<<TXEN);
+    uart_init();
 
     //init timer fuer segment
     TIMSK |= (1<<TOIE0);
