@@ -1,5 +1,5 @@
 TARGET=main
-MCU=atmega8
+MCU=atmega328p
 #SOURCES=$(TARGET).cpp l74hc595b.cpp Input.cpp seven_seg.cpp Ou
 SOURCES=$(shell find . -type f -name '*.cpp')
 

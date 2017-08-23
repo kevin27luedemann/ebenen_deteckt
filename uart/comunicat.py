@@ -8,6 +8,7 @@ import sys
 def main():
     ser = se.Serial('/dev/ttyUSB0', 9600)
     last = ""
+    weather = ""
     while True:
         #now = dt.datetime.now().strftime("%H%M1AA%S1")
         now = dt.datetime.now().strftime("%H%M1")
@@ -15,11 +16,13 @@ def main():
             for n in now:
                 ser.write(n)
             last = now
-        else:
-            ti.sleep(1)
-            ser.write('d')
-            sys.stdout.write("\r{}, {}".format(now,ser.read()))
-            sys.stdout.flush()
+        ti.sleep(1)
+        ser.write('d')
+        taster = ser.read()
+        ser.write('w')
+        weather = ser.readline()[:-1]
+        sys.stdout.write("\r{}, {}, {}".format(now,taster, weather))
+        sys.stdout.flush()
         #print now, ser.read()
 
 if __name__ == "__main__":

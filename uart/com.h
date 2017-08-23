@@ -13,23 +13,24 @@
 #include <util/setbaud.h>
 
 void uart_init(void){
-    UBRRH   = UBRRH_VALUE;
-    UBRRL   = UBRRL_VALUE;
-	UCSRC   = (1<<URSEL) | (1<<UCSZ0) | (1<<UCSZ1);	// 8Bit Frame
-	UCSRB   = (1<<RXCIE) | (1<<RXEN) | (1<<TXEN);
+    UBRR0H   = UBRRH_VALUE;
+    UBRR0L   = UBRRL_VALUE;
+    //UCSR0C   = (1<<URSEL) | (1<<UCSZ0) | (1<<UCSZ1);	// 8Bit Frame
+    UCSR0C   = (1<<UCSZ00) | (1<<UCSZ01);	// 8Bit Frame
+    UCSR0B   = (1<<RXCIE0) | (1<<RXEN0) | (1<<TXEN0);
 }
 
 /* Zeichen senden*/
 void uart_putc(unsigned char c)
 {
-    while (!(UCSRA & (1<<UDRE)))  /* warten bis Senden moeglich */
+    while (!(UCSR0A & (1<<UDRE0)))  /* warten bis Senden moeglich */
     {
     }                             
 
-    UDR = c;                      /* sende Zeichen */
+    UDR0 = c;                      /* sende Zeichen */
 }
 
-void uart_puts (char *s)
+void uart_puts (const char *s)
 {
     while (*s)
     {   /* so lange *s != '\0' also ungleich dem "String-Endezeichen(Terminator)" */
@@ -41,12 +42,12 @@ void uart_puts (char *s)
 /* Zeichen empfangen */
 uint8_t uart_getc(void)
 {
-    while (!(UCSRA & (1<<RXC)))   // warten bis Zeichen verfuegbar
+    while (!(UCSR0A & (1<<RXC0)))   // warten bis Zeichen verfuegbar
         ;
-    return UDR;                   // Zeichen aus UDR an Aufrufer zurueckgeben
+    return UDR0;                   // Zeichen aus UDR an Aufrufer zurueckgeben
 }
 
-void uart_gets( char* Buffer, uint8_t MaxLen )
+void uart_gets(char* Buffer, uint8_t MaxLen )
 {
   uint8_t NextChar;
   uint8_t StringLen = 0;
