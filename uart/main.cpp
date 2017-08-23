@@ -11,14 +11,12 @@
 #include "Input.h"
 #include "Output.h"
 //#include "l74hc595b.h"
-#include "tm1637.h"
 #include "DHT22.h"
 DHT22 dht22(0, PD2, &DDRD, &PORTD, INT0, ISC00, ISC01, INTF0, &EIMSK, &EICRA, &EIFR, CS21, &OCR2A, &TCNT2, &TCCR2B);
 #include "com.h"
 
 //l74hc595b shift_reg(&DDRB,&PORTB,1,2,3,1);
 //seven_seg seg(4,&DDRC,&PORTC,0,&shift_reg);
-tm1637 seg;
 Input taster(&DDRD,&PORTD,&PIND,6,true);
 Output LED(&DDRB,&PORTB,0);
 #define WEATHER_FLAG 0
@@ -62,7 +60,6 @@ ISR(USART_RX_vect){
         }
         else{
             //seg.set_number(count,temp-'0');
-            seg.segments[count] = temp-'0';
             count++;
         }
     }
@@ -91,7 +88,6 @@ int main(void) {
     seg.set_number(2,0);
     seg.set_number(3,0);
     */
-    seg.setSegments();
 
     uint16_t counter = 0;
 	while(true) 
@@ -107,7 +103,6 @@ int main(void) {
         if(taster.ison()){LED.on();}
         else{LED.off();}
         if((flag_reg&(1<<WEATHER_FLAG))){send_weather();flag_reg&=~(1<<WEATHER_FLAG);}
-        if((flag_reg&(1<<DISP_UPDATE))){seg.setSegments();flag_reg&=~(1<<DISP_UPDATE);}
 	}
 
 }
