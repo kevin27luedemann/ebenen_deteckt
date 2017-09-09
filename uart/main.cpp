@@ -14,11 +14,12 @@
 #include "DHT22.h"
 DHT22 dht22(0, PD2, &DDRD, &PORTD, INT0, ISC00, ISC01, INTF0, &EIMSK, &EICRA, &EIFR, CS21, &OCR2A, &TCNT2, &TCCR2B);
 #include "com.h"
-#include "tm1637.h"
+//#include "tm1637.h"
 
 //l74hc595b shift_reg(&DDRB,&PORTB,1,2,3,1);
 //seven_seg seg(4,&DDRC,&PORTC,0,&shift_reg);
 Input taster(&DDRD,&PORTD,&PIND,6,true);
+Input ebene0(&DDRC,&PORTC,&PINC,5,true);
 Output LED(&DDRB,&PORTB,0);
 #define WEATHER_FLAG 0
 #define DISP_UPDATE 1
@@ -37,6 +38,7 @@ ISR(INT0_vect){
    dht22.ISR_INT_ROUTINE();
 }
 
+/*
 ISR(TIMER1_COMPA_vect){
     if(!(flag_reg&(1<<MANUAL_UPDATE))){
         flag_reg |= (1<<DISP_UPDATE);
@@ -48,12 +50,14 @@ ISR(TIMER1_COMPA_vect){
         flag_reg |= (1<<ALTERNATE);
     }
 }
+*/
 
 ISR(USART_RX_vect){
     uint8_t temp = uart_getc();
     static uint8_t count = 0;
     if(temp=='d'){
         uart_putc(taster.ison()+'0');
+        uart_putc(ebene0.ison()+'0');
     }
     else if(temp=='w'){
         dht22.DHT22_StartReading();
@@ -66,6 +70,7 @@ ISR(USART_RX_vect){
     else if(temp=='a'){
         flag_reg &= ~(1<<MANUAL_UPDATE);
     }
+	/*
     else{
         if(count==4){
             //tm1637_dp = temp-'0';
@@ -76,15 +81,15 @@ ISR(USART_RX_vect){
             tm1637_setzif(count,temp-'0');
             count++;
         }
-    }
+    }*/
     
 }
 
 int main(void) {
 
     uart_init();
-    tm1637_init();
-    tm1637_dp = 0;
+    //tm1637_init();
+    //tm1637_dp = 0;
     flag_reg = 0;
 
     //init timer fuer segment
@@ -95,9 +100,9 @@ int main(void) {
     TCCR2A = (1 << WGM21);
     TIMSK2 = (1 << OCIE2A);
     //seconds timer
-    TIMSK1 = (1 << OCIE1A);
-    OCR1A  = 31250;
-    TCCR1B = (1 << WGM12) | (1 << CS12); //CTC Mode, Presc 256
+    //TIMSK1 = (1 << OCIE1A);
+    //OCR1A  = 31250;
+    //TCCR1B = (1 << WGM12) | (1 << CS12); //CTC Mode, Presc 256
     sei();
 
     /*
@@ -121,13 +126,15 @@ int main(void) {
             //seg.set_number(3,counter%10);
         }
         if(taster.ison() || (flag_reg&(1<<ALTERNATE))){LED.on();}
+        else if(ebene0.ison() || (flag_reg&(1<<ALTERNATE))){LED.on();}
         else{LED.off();}
         if((flag_reg&(1<<WEATHER_FLAG))){send_weather();flag_reg&=~(1<<WEATHER_FLAG);}
-        if((flag_reg&(1<<DISP_UPDATE))){update_disp_wae();flag_reg&=~(1<<DISP_UPDATE);}
+        //if((flag_reg&(1<<DISP_UPDATE))){update_disp_wae();flag_reg&=~(1<<DISP_UPDATE);}
 	}
 
 }
 
+/*
 void update_disp_wae(){
     uint8_t status = 0;
     status = dht22.DHT22_StartReading();
@@ -147,7 +154,7 @@ void update_disp_wae(){
         tm1637_setzif(3,0);
     }
     tm1637_dp = 1;
-}
+}*/
 
 void send_weather(){
    uint8_t status = 0;
